@@ -2,6 +2,7 @@ defmodule FoodDiaryWeb.Schema.Types.Root do
   use Absinthe.Schema.Notation
 
   alias Crudry.Middlewares.TranslateErrors
+  alias FoodDiaryWeb.Resolvers.Meal, as: MealResolver
   alias FoodDiaryWeb.Resolvers.User, as: UserResolver
 
   import_types FoodDiaryWeb.Schema.Types.Meal
@@ -26,6 +27,13 @@ defmodule FoodDiaryWeb.Schema.Types.Root do
     field :delete_user, type: :user do
       arg :id, non_null(:id)
       resolve &UserResolver.delete/2
+    end
+
+    @desc "Create a new Meal"
+    field :create_meal, type: :meal do
+      arg :input, non_null(:create_meal_input)
+      resolve &MealResolver.create/2
+      middleware TranslateErrors
     end
   end
 end
