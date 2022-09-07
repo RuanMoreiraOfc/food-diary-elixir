@@ -8,4 +8,8 @@ defmodule FoodDiaryWeb.Resolvers.User do
   def create(%{input: parmas}, _context) do
     Users.Create.call(parmas)
   end
+
+  def delete(%{id: id}, _context) do
+    Users.Delete.call(id)
+  end
 end
