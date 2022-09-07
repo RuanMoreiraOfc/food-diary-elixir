@@ -32,5 +32,29 @@ defmodule FoodDiaryWeb.SchemaTest do
 
       assert expected_response === response
     end
+
+    test "fails to get a user by id from database when id is invalid", %{conn: conn} do
+      query = """
+      {
+        user(id: id) {
+          name
+          email
+        }
+      }
+      """
+
+      response =
+        conn
+        |> post("/api/graphql", %{query: query})
+        |> json_response(:ok)
+
+      assert %{
+               "errors" => [
+                 %{
+                   "message" => "Argument \"id\" has invalid value id."
+                 }
+               ]
+             } = response
+    end
   end
 end
