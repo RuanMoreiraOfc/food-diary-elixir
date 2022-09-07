@@ -1,7 +1,20 @@
 defmodule FoodDiaryWeb.SchemaTest do
   use FoodDiaryWeb.ConnCase, async: true
+  use FoodDiaryWeb.SubscriptionCase
 
   import FoodDiary.Factory
+
+  defp setupSubscription(socket, subscription, mutation) do
+    # subscription setup
+    subscription_socket_ref = push_doc(socket, subscription)
+    assert_reply subscription_socket_ref, :ok, %{subscriptionId: subscription_id}
+
+    # mutation setup
+    mutation_socket_ref = push_doc(socket, mutation)
+    assert_reply mutation_socket_ref, :ok, mutation_response
+
+    %{mutation_response: mutation_response, subscription_id: subscription_id}
+  end
 
   describe "RootQuery/User" do
     test "gets a user by id from database when id is valid", %{conn: conn} do
@@ -114,6 +127,77 @@ defmodule FoodDiaryWeb.SchemaTest do
                  }
                }
              } = response
+    end
+  end
+
+  describe "RootSubscription/Meals" do
+    test "watch any meal creation in database", %{socket: socket} do
+      %{id: user_id} = insert(:user)
+
+      %{
+        description: description,
+        calories: calories,
+        category: category
+      } = build(:meal_params, description: "wow a drink")
+
+      mutation = """
+      mutation {
+        createMeal(input: {
+          user_id: "#{user_id}",
+          description: "#{description}",
+          calories: #{calories},
+          category: #{category}
+        }) {
+          description
+          calories
+          category
+        }
+      }
+      """
+
+      subscription = """
+      subscription {
+        newMeal {
+          id
+          description
+          calories
+          category
+        }
+      }
+      """
+
+      expected_mutation_response = %{
+        data: %{
+          "createMeal" => %{
+            "description" => description,
+            "calories" => calories,
+            "category" => [category]
+          }
+        }
+      }
+
+      %{
+        subscription_id: subscription_id,
+        mutation_response: mutation_response
+      } = setupSubscription(socket, subscription, mutation)
+
+      assert expected_mutation_response === mutation_response
+
+      assert_push "subscription:data", subscription_response
+
+      assert %{
+               subscriptionId: ^subscription_id,
+               result: %{
+                 data: %{
+                   "newMeal" => %{
+                     "id" => _id,
+                     "description" => ^description,
+                     "calories" => ^calories,
+                     "category" => [^category]
+                   }
+                 }
+               }
+             } = subscription_response
     end
   end
 end
