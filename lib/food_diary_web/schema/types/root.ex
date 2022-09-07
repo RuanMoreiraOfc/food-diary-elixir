@@ -36,4 +36,12 @@ defmodule FoodDiaryWeb.Schema.Types.Root do
       middleware TranslateErrors
     end
   end
+
+  object :root_subscription do
+    field :new_meal, :meal do
+      config fn _args, _context ->
+        {:ok, topic: "new_meal_topic"}
+      end
+    end
+  end
 end
