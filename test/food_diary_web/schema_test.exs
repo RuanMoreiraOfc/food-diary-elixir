@@ -56,5 +56,30 @@ defmodule FoodDiaryWeb.SchemaTest do
                ]
              } = response
     end
+
+    test "fails to get a user by id from database when it doesn't exists", %{conn: conn} do
+      query = """
+      {
+        user(id: 0) {
+          name
+          email
+        }
+      }
+      """
+
+      response =
+        conn
+        |> post("/api/graphql", %{query: query})
+        |> json_response(:ok)
+
+      assert %{
+               "errors" => [
+                 %{
+                   "message" => "User not found",
+                   "path" => ["user"]
+                 }
+               ]
+             } = response
+    end
   end
 end
