@@ -22,6 +22,19 @@ defmodule FoodDiary.Factory do
     }
   end
 
+  def meal_params_factory do
+    calories =
+      "20.00"
+      |> Decimal.new()
+      |> Decimal.to_float()
+
+    %{
+      category: "FOOD",
+      calories: calories,
+      description: "content here"
+    }
+  end
+
   def meal_base_factory do
     calories =
       "20.00"
