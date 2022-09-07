@@ -82,4 +82,38 @@ defmodule FoodDiaryWeb.SchemaTest do
              } = response
     end
   end
+
+  describe "RootMutation/User" do
+    test "create a user in database when all params are valid", %{conn: conn} do
+      %{name: name, email: email} = build(:user_params)
+
+      mutation = """
+      mutation {
+        createUser(input: {
+          name: "#{name}"
+          email: "#{email}"
+        }) {
+          id
+          name
+          email
+        }
+      }
+      """
+
+      response =
+        conn
+        |> post("/api/graphql", %{query: mutation})
+        |> json_response(:ok)
+
+      assert %{
+               "data" => %{
+                 "createUser" => %{
+                   "id" => _id,
+                   "name" => ^name,
+                   "email" => ^email
+                 }
+               }
+             } = response
+    end
+  end
 end
