@@ -3,6 +3,13 @@ defmodule FoodDiary.Factory do
 
   alias FoodDiary.{User, Meal}
 
+  def user_params_factory do
+    %{
+      name: "Some body",
+      email: sequence(:email, &"email-#{&1}@example.com")
+    }
+  end
+
   def user_factory do
     %User{
       id: 0,
