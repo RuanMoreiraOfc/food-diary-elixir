@@ -9,7 +9,10 @@ defmodule FoodDiaryWeb.Router do
     pipe_through :api
 
     forward "/graphql", Absinthe.Plug, schema: FoodDiaryWeb.Schema
-    forward "/graphiql", Absinthe.Plug.GraphiQL, schema: FoodDiaryWeb.Schema
+
+    forward "/graphiql", Absinthe.Plug.GraphiQL,
+      schema: FoodDiaryWeb.Schema,
+      socket: FoodDiaryWeb.FoodSocket
   end
 
   # Enables LiveDashboard only for development

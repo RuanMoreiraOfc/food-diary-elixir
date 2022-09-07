@@ -1,5 +1,6 @@
 defmodule FoodDiaryWeb.FoodSocket do
   use Phoenix.Socket
+  use Absinthe.Phoenix.Socket, schema: FoodDiaryWeb.Schema
 
   # A Socket handler
   #
